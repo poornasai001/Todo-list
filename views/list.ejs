@@ -7,21 +7,118 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <header class="header">
+        <div class="header-content">
+            <h1>📋 My Todo List</h1>
+            <p>Stay organized and productive</p>
+        </div>
+    </header>
+
     <div class="box">
-        <h1>Todo list</h1>
-    </div>
-    <div class="box">
-        <% for(var i=0 ; i< ejes.length; i++){%>
-            <div class="item">
-                <input type="checkbox">
-                <P><%= ejes[i] %></P>
+        <div id="heading">
+            <h1><%= listTitle %></h1>
+        </div>
+
+        <div class="filter-section">
+            <form action="/" method="GET" class="filter-form">
+                <label for="priority-filter">Filter by Priority:</label>
+                <select name="priority" id="priority-filter" onchange="this.form.submit()">
+                    <option value="all" <%= selectedPriority === 'all' ? 'selected' : '' %>>All Tasks</option>
+                    <option value="high" <%= selectedPriority === 'high' ? 'selected' : '' %>>High Priority</option>
+                    <option value="medium" <%= selectedPriority === 'medium' ? 'selected' : '' %>>Medium Priority</option>
+                    <option value="low" <%= selectedPriority === 'low' ? 'selected' : '' %>>Low Priority</option>
+                </select>
+            </form>
+        </div>
+
+        <% if (typeof error !== 'undefined' || (typeof query !== 'undefined' && query.error === 'empty')) { %>
+            <div class="alert error-alert">
+                ⚠️ Please enter a task before adding it to your list!
             </div>
-            
-        <% };%>
-        <form action="/" method="POST">
-            <input type="text" name="ele1" placeholder="Enter the task">
-            <button type="submit">+</button>
+        <% } %>
+
+        <div class="box">
+            <% for(var i=0; i < newListItems.length; i++) { %>
+                <div class="item" id="item-<%= newListItems[i].id %>">
+                    <form action="/toggle/<%= newListItems[i].id %>" method="POST" style="display: inline;">
+                        <input type="checkbox" <%= newListItems[i].completed ? 'checked' : '' %> onchange="this.form.submit()">
+                    </form>
+                    
+                    <p class="<%= newListItems[i].completed ? 'completed-task' : '' %>">
+                        <%= newListItems[i].task %>
+                        <span class="priority-badge priority-<%= newListItems[i].priority %>">
+                            <%= newListItems[i].priority.toUpperCase() %>
+                        </span>
+                    </p>
+                    
+                    <div class="task-actions">
+                        <button class="edit-btn" onclick="showEdit(<%= newListItems[i].id %>)">✏️</button>
+                        <form action="/delete/<%= newListItems[i].id %>" method="POST" style="display: inline;" 
+                              onsubmit="return confirm('Delete this task?')">
+                            <button type="submit" class="delete-btn">🗑️</button>
+                        </form>
+                    </div>
+                    
+                    <div class="edit-form" id="edit-form-<%= newListItems[i].id %>" style="display: none;">
+                        <form action="/edit/<%= newListItems[i].id %>" method="POST">
+                            <input type="text" name="editTask" value="<%= newListItems[i].task %>" required>
+                            <select name="editPriority">
+                                <option value="high" <%= newListItems[i].priority === 'high' ? 'selected' : '' %>>High</option>
+                                <option value="medium" <%= newListItems[i].priority === 'medium' ? 'selected' : '' %>>Medium</option>
+                                <option value="low" <%= newListItems[i].priority === 'low' ? 'selected' : '' %>>Low</option>
+                            </select>
+                            <button type="submit" class="save-btn">💾</button>
+                            <button type="button" class="cancel-btn" onclick="hideEdit(<%= newListItems[i].id %>)">❌</button>
+                        </form>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+        <form action="/" method="POST" onsubmit="return checkInput()">
+            <div class="add-todo-section">
+                <input type="text" name="ele1" id="taskInput" placeholder="Enter the task" maxlength="100">
+                <select name="priority" class="priority-select">
+                    <option value="high">High Priority</option>
+                    <option value="medium" selected>Medium Priority</option>
+                    <option value="low">Low Priority</option>
+                </select>
+                <button type="submit">+</button>
+            </div>
         </form>
     </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Todo List App.</p>
+            <p>Keep your tasks organized and stay productive! 🚀</p>
+        </div>
+    </footer>
+
+    <script>
+        function checkInput() {
+            const input = document.getElementById('taskInput');
+            if (!input.value.trim()) {
+                alert('⚠️ Please enter a task!');
+                input.focus();
+                return false;
+            }
+            return true;
+        }
+
+        function showEdit(id) {
+            const form = document.getElementById('edit-form-' + id);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function hideEdit(id) {
+            document.getElementById('edit-form-' + id).style.display = 'none';
+        }
+
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => alert.style.display = 'none');
+        }, 5000);
+    </script>
 </body>
 </html>
