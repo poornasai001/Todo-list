@@ -804,7 +804,7 @@ h1 {
     background: var(--color-surface);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
-    overflow: hidden;
+    overflow: visible;
     border: 1px solid var(--color-card-border);
 }
 
@@ -1014,15 +1014,16 @@ p {
 }
 
 .edit-form {
-    position: absolute;
-    top: 100%;
-    left: var(--space-20);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     right: var(--space-20);
     background: var(--color-surface);
     border: 2px solid var(--color-primary);
     border-radius: var(--radius-base);
     padding: var(--space-16);
-    z-index: 10;
+    z-index: 1000;
     box-shadow: var(--shadow-lg);
 }
 
